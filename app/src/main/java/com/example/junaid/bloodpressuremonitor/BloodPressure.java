@@ -26,7 +26,7 @@ import java.util.UUID;
 public class BloodPressure extends AppCompatActivity {
 
     Button startButton, stopButton;
-    TextView txtString, txtStringLength, sensorView0, sensorView1, sensorView2;
+    TextView txtString, txtStringLength, map, sys, dia;
     ProgressBar progressBar;
     String address;
     Handler bluetoothIn;
@@ -52,7 +52,7 @@ public class BloodPressure extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent deviceIntent = new Intent(BloodPressure.this, DeviceListActivity.class);
+                Intent deviceIntent = new Intent(BloodPressure.this, DeviceListActivity.class); // start new activity to connect the paired bluetooth device
                 startActivity(deviceIntent);
             }
         });
@@ -62,51 +62,51 @@ public class BloodPressure extends AppCompatActivity {
         stopButton = (Button) findViewById(R.id.stopbutton);
         txtString = (TextView) findViewById(R.id.txtString);
         txtStringLength = (TextView) findViewById(R.id.txtLength);
-        sensorView0 = (TextView) findViewById(R.id.map_value);
-        sensorView1 = (TextView) findViewById(R.id.sys_value);
-        sensorView2 = (TextView) findViewById(R.id.dia_value);
+        map = (TextView) findViewById(R.id.map_value);
+        sys = (TextView) findViewById(R.id.sys_value);
+        dia = (TextView) findViewById(R.id.dia_value);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         bluetoothIn = new Handler() {
             public void handleMessage(android.os.Message msg) {
-                if (msg.what == handlerState) {										//if message is what we want
-                    String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
-                    recDataString.append(readMessage);      								//keep appending to string until ~
-                    int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
-                    if (endOfLineIndex > 0) {                                           // make sure there data before ~
-                        String dataInPrint = recDataString.substring(0, endOfLineIndex+1);    // extract string
+                if (msg.what == handlerState) {										            // if msg is what we expect
+                    String readMessage = (String) msg.obj;
+                    recDataString.append(readMessage);      								    // keep appending to msg until ~
+                    int endOfLineIndex = recDataString.indexOf("~");                            // end of the msg
+                    if (endOfLineIndex > 0) {                                                   // make sure there is a msg before ~
+                        String dataInPrint = recDataString.substring(0, endOfLineIndex+1);      // extract msg
                         txtString.setText("Data Received = " + dataInPrint);
-                        int dataLength = dataInPrint.length();							//get length of data received
+                        int dataLength = dataInPrint.length();							        // length of msg received
                         txtStringLength.setText("Data Length = " + String.valueOf(dataLength));
 
-                        if (recDataString.charAt(0) == '#')								//if it starts with # we know it is what we are looking for
+                        if (recDataString.charAt(0) == '#')								        // if msg starts with # , guarantees what we are expecting
                         {
-                            String sensor0 = recDataString.substring(1, 3);
-                            String sensor1 = recDataString.substring(4, 7);
-                            String sensor2 = recDataString.substring(8, 10);
+                            String map_val = recDataString.substring(1, 3);
+                            String sys_val = recDataString.substring(4, 7);
+                            String dia_val = recDataString.substring(8, 10);
 
-                            sensorView0.setText(sensor0);	//update the textviews with sensor values
-                            sensorView1.setText(sensor1);
-                            sensorView2.setText(sensor2);
-                            int progressValue = Integer.parseInt(sensor1) - 80;
+                            map.setText(map_val);	                                            // update the textviews with the blood pressure values
+                            sys.setText(sys_val);
+                            dia.setText(dia_val);
+                            int progressValue = Integer.parseInt(sys_val) - 80;
                             progressBar.setProgress(progressValue);
                         }
-                        recDataString.delete(0, recDataString.length()); 					//clear all string data
+                        recDataString.delete(0, recDataString.length()); 					    // clear all string data
                     }
                 }
             }
         };
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        checkBluetoothState();
+        checkBluetoothState();                                                                  // method to check the bluetooth status
 
-        stopButton.setOnClickListener(new View.OnClickListener() {
+        stopButton.setOnClickListener(new View.OnClickListener() {                              // reset the main activity and update the textviews
             public void onClick(View v) {
                 mConnectedThread.write("0");
                 Toast.makeText(getBaseContext(), "Reset", Toast.LENGTH_SHORT).show();
-                sensorView0.setText("---");
-                sensorView1.setText("---");
-                sensorView2.setText("---");
+                map.setText("---");
+                sys.setText("---");
+                dia.setText("---");
                 txtString.setText("");
                 txtStringLength.setText("");
                 progressBar.setProgress(0);
@@ -114,7 +114,7 @@ public class BloodPressure extends AppCompatActivity {
         });
 
         startButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            public void onClick(View v) {                                                 // start the blood pressure measurement
                 mConnectedThread.write("1");
                 Toast.makeText(getBaseContext(), "Measurement starts! Please stay still", Toast.LENGTH_LONG).show();
             }
@@ -126,20 +126,20 @@ public class BloodPressure extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         Intent intent = getIntent();
-        address = intent.getStringExtra("MAC_ADDRESS");
+        address = intent.getStringExtra("MAC_ADDRESS");                                         // get the MAC address of the bluetooth device
 
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice mDevice : pairedDevices) {
                 if (mDevice.getAddress().equals(address)) {
                     try {
-                        btSocket = mDevice.createRfcommSocketToServiceRecord(BTMODULEUUID);
+                        btSocket = mDevice.createRfcommSocketToServiceRecord(BTMODULEUUID);     // create RFCOMM bluetooth socket connection with the device
                     } catch (IOException e) {
                         Toast.makeText(getBaseContext(), "Socket creation failed", Toast.LENGTH_LONG).show();
                     }
                     try {
                         btSocket.connect();
-                        mConnectedThread = new ConnectedThread(btSocket);
+                        mConnectedThread = new ConnectedThread(btSocket);                       // thread to communicate with the bluetooh device
                         mConnectedThread.start();
                     } catch (IOException e) {
                         try {
@@ -174,7 +174,7 @@ public class BloodPressure extends AppCompatActivity {
 
         if(!bluetoothAdapter.isEnabled())
         {
-            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);                 // ask permission to turn-ON the bluetooth if it is turned-OFF
             startActivity(intent);
 
         }
@@ -204,9 +204,9 @@ public class BloodPressure extends AppCompatActivity {
 
             while (true) {
                 try {
-                    bytes = mmInStream.read(buffer);
+                    bytes = mmInStream.read(buffer);                                                    // read msg from the bluetooth device
                     String readMessage = new String(buffer, 0, bytes);
-                    bluetoothIn.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();
+                    bluetoothIn.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();     // update the main thread with the msg received
                 } catch (IOException e) {
                     break;
                 }
@@ -215,7 +215,7 @@ public class BloodPressure extends AppCompatActivity {
         public void write(String input) {
             byte[] msgBuffer = input.getBytes();
             try {
-                mmOutStream.write(msgBuffer);
+                mmOutStream.write(msgBuffer);                                                           // write msg to the blutooth device
             } catch (IOException e) {
                 Toast.makeText(getBaseContext(), "Connection Failure", Toast.LENGTH_LONG).show();
                 finish();
@@ -245,7 +245,7 @@ public class BloodPressure extends AppCompatActivity {
         }
 
         if (id == R.id.help) {
-            Intent helpIntent = new Intent(BloodPressure.this, HowToMeasureBP.class);
+            Intent helpIntent = new Intent(BloodPressure.this, HowToMeasureBP.class);                   // new activity for the help on how to measure the blood pressure
             startActivity(helpIntent);
             return true;
         }

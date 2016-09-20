@@ -15,8 +15,8 @@ public class HowToMeasureBP extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ViewPager mViewPager = (ViewPager) findViewById(R.id.viewpage);
-        ImageAdapter adapterView = new ImageAdapter(this);
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.viewpage);                             // view pager to flip left and right through pages of data
+        ImageAdapter adapterView = new ImageAdapter(this);                                          // image adapter to show images in the view pager
         mViewPager.setAdapter(adapterView);
     }
 

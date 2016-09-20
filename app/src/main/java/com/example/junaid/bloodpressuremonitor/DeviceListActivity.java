@@ -36,7 +36,7 @@ public class DeviceListActivity extends AppCompatActivity {
         super.onResume();
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        checkBluetoothState();
+        checkBluetoothState();                                                                      // method to check the bluetooth status
 
 
         textView1 = (TextView) findViewById(R.id.connecting);
@@ -49,7 +49,7 @@ public class DeviceListActivity extends AppCompatActivity {
         pairedListView.setOnItemClickListener(mDeviceClickListener);
 
 
-        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();                   // get the names and MAC addresses of all the paired bluetooth devices
 
         if (pairedDevices.size() > 0) {
             findViewById(R.id.title_paired_devices).setVisibility(View.VISIBLE);
@@ -66,7 +66,7 @@ public class DeviceListActivity extends AppCompatActivity {
             String info = ((TextView) v).getText().toString();
             String address = info.substring(info.length() - 17);
 
-            Intent intent = new Intent(DeviceListActivity.this, BloodPressure.class);
+            Intent intent = new Intent(DeviceListActivity.this, BloodPressure.class);               // send the MAC address to the main activity
             intent.putExtra("MAC_ADDRESS", address);
             startActivity(intent);
         }
@@ -76,7 +76,7 @@ public class DeviceListActivity extends AppCompatActivity {
 
         if(!bluetoothAdapter.isEnabled())
         {
-            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);                     // ask permission to turn-ON the bluetooth if it is turned-OFF
             startActivity(intent);
 
         }

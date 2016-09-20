@@ -17,10 +17,10 @@ public class ImageAdapter  extends PagerAdapter{
 
     @Override
     public int getCount() {
-        return sliderImagesId.length;
+        return sliderImagesId.length;                                                               // get total no. of the images
     }
 
-    private int[] sliderImagesId = new int[]{
+    private int[] sliderImagesId = new int[]{                                                       // images to show in the view pager
             R.drawable.bpm_1, R.drawable.bpm_2, R.drawable.bpm_3,
             R.drawable.bpm_4, R.drawable.bpm_5, R.drawable.bpm_6,
             R.drawable.bpm_7, R.drawable.bpm_8, R.drawable.bpm_9,
@@ -34,7 +34,7 @@ public class ImageAdapter  extends PagerAdapter{
     }
 
     @Override
-    public Object instantiateItem(ViewGroup container, int i) {
+    public Object instantiateItem(ViewGroup container, int i) {                                     // set new image to the view pager
         ImageView mImageView = new ImageView(mContext);
         mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         mImageView.setImageResource(sliderImagesId[i]);
@@ -43,7 +43,7 @@ public class ImageAdapter  extends PagerAdapter{
     }
 
     @Override
-    public void destroyItem(ViewGroup container, int i, Object obj) {
+    public void destroyItem(ViewGroup container, int i, Object obj) {                               // destroy the last image from the view pager
         ((ViewPager) container).removeView((ImageView) obj);
     }
 }
