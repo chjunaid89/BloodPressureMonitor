@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Blood Pressure Monitor</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_device_list"> Bluetooth Devices List</string>
+    <string name="title_activity_how_to_measure_bp">How To Measure BP</string>
+    <string name="action_help">Help</string>
+</resources>
